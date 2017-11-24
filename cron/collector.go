@@ -58,7 +58,13 @@ func convirtProcessInfoToMetrics(procInfo []Win32_PerfRawData_perfProc_Process)(
 
 	for i:=0;i<len(procInfo);i++{
 		cmdline := procInfo[i].Name
-		cpu_percent := float64(procInfo[i].PercentProcessorTime) / float64(total_time)
+		cpu_percent := (float64(procInfo[i].PercentProcessorTime) / float64(total_time))*100.0
+		if (cmdline == "System"||cmdline == "_Total") {
+			continue
+		}
+		if cpu_percent < 1{
+			continue
+		}
 		var tag string
 		if tags != "" {
 			tag = fmt.Sprintf("%s,pid=%d,cmdline=%s", tags, procInfo[i].IDProcess, cmdline)
